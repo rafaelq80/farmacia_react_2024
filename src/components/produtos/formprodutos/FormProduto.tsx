@@ -6,6 +6,7 @@ import { atualizar, cadastrar, listar } from "../../../services/Service";
 
 import Categoria from '../../../models/Categoria';
 import Produto from '../../../models/Produto';
+import { ToastAlerta } from '../../../utils/ToastAlerta';
 
 function FormProduto() {
 
@@ -23,11 +24,21 @@ function FormProduto() {
     const { id } = useParams<{ id: string }>()
 
     async function buscarProdutoPorId(id: string) {
-        await listar(`/produtos/${id}`, setProduto)
+        try{
+            await listar(`/produtos/${id}`, setCategoria)
+        }catch(error: any){
+            ToastAlerta('Produto não Encontrado!', 'erro')
+            retornar();
+        }
     }
 
     async function buscarCategoriaPorId(id: string) {
-        await listar(`/categorias/${id}`, setCategoria)
+        try{
+            await listar(`/categorias/${id}`, setCategoria)
+        }catch(error: any){
+            ToastAlerta('Categoria não Encontrada!', 'erro')
+            retornar();
+        }
     }
 
     async function buscarCategorias() {
@@ -86,29 +97,26 @@ function FormProduto() {
             try {
                 await atualizar(`/produtos`, produto, setProduto);
 
-                alert('Produto atualizado com sucesso')
+                ToastAlerta('Produto atualizado com sucesso', 'sucesso')
 
             } catch (error: any) {
-                alert('Erro ao atualizar o Produto')
+                ToastAlerta('Erro ao atualizar o Produto', 'erro')
             }
 
         } else {
             try {
                 await cadastrar(`/produtos`, produto, setProduto)
 
-                alert('Produto cadastrado com sucesso');
+                ToastAlerta('Produto cadastrado com sucesso', 'sucesso');
 
             } catch (error: any) {
-                alert('Erro ao cadastrar a Postagem');
+                ToastAlerta('Erro ao cadastrar a Postagem', 'erro');
             }
         }
 
         setIsLoading(false)
         retornar()
     }
-
-    //const carregandoCategoria = categoria.nome === '';
-    console.log(JSON.stringify(produto))
 
     return (
 

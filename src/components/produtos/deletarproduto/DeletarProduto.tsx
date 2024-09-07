@@ -1,9 +1,10 @@
 ﻿import { useEffect, useState } from "react"
 import { RotatingLines } from "react-loader-spinner"
 import { useNavigate, useParams } from "react-router-dom"
-import Categoria from "../../../models/Categoria"
-import { deletar, listar } from "../../../services/Service"
 import Produto from "../../../models/Produto"
+import { deletar, listar } from "../../../services/Service"
+import { ToastAlerta } from "../../../utils/ToastAlerta"
+import { Check, X } from "@phosphor-icons/react"
 
 function DeletarProduto() {
 
@@ -18,7 +19,7 @@ function DeletarProduto() {
         try {
             await listar(`/produtos/${id}`, setProduto)
         } catch (error: any) {
-            alert('Produto não encontrado!')
+            ToastAlerta('Produto não encontrado!', 'erro')
 
         }
     }
@@ -35,10 +36,10 @@ function DeletarProduto() {
         try {
             await deletar(`/produtos/${id}`)
 
-            alert('Produto apagado com sucesso')
+            ToastAlerta('Produto apagado com sucesso', 'sucesso')
 
         } catch (error) {
-            alert('Erro ao apagar o Produto')
+            ToastAlerta('Erro ao apagar o Produto', 'erro')
         }
 
         setIsLoading(false)
@@ -56,16 +57,15 @@ function DeletarProduto() {
                 Você tem certeza de que deseja apagar o Produto a seguir?</p>
             <div className='border flex flex-col rounded-2xl overflow-hidden justify-between'>
                 <header
-                    className='py-2 px-6 bg-indigo-600 text-white font-bold text-2xl'>
+                    className='py-2 px-6 bg-indigo-800 text-white font-bold text-2xl'>
                     Produto
                 </header>
                 <p className='p-8 text-3xl bg-white h-full'>{produto.nome}</p>
                 <div className="flex">
                     <button
-                        className='text-slate-100 bg-red-400 hover:bg-red-600 w-full py-2'
-                        onClick={retornar}
+                        className='text-slate-100 bg-red-400 hover:bg-red-600 w-full py-2 flex justify-center'                        onClick={retornar}
                     >
-                        Não
+                        <X size={28} color="#ffffff" weight="bold"/>
                     </button>
                     <button
                         className='w-full text-slate-100 bg-indigo-400 
@@ -80,7 +80,7 @@ function DeletarProduto() {
                                 width="24"
                                 visible={true}
                             /> :
-                            <span>Sim</span>
+                            <Check size={28} color="#ffffff" weight="bold" />
                         }
                     </button>
                 </div>
