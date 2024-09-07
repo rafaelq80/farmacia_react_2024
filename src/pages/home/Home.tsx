@@ -1,3 +1,5 @@
+import ListarProdutos from "../../components/produtos/listarprodutos/ListarProdutos"
+import ModalProduto from "../../components/produtos/modalprodutos/ModalProduto"
 
 function Home() {
     return (
@@ -30,11 +32,15 @@ function Home() {
                         <p className='text-2xl'>Medicamento Barato é aqui!</p>
 
                         <div className="flex justify-around gap-4">
-                        <div className='rounded text-indigo-900 
-                                            border-indigo-900 border-solid border-2 py-2 px-4'
-                                >
-                                Novo Produto
-                            </div>
+                            <button className='
+                                    rounded
+                                    bg-cyan-200
+                                    text-indigo-900 
+                                    py-2 
+                                    px-4
+                                    '>
+                                <ModalProduto />
+                            </button>
                         </div>
                     </div>
 
@@ -47,6 +53,7 @@ function Home() {
                     </div>
                 </div>
             </div>
+            <ListarProdutos />
         </>
     )
 }

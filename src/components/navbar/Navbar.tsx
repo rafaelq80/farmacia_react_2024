@@ -33,7 +33,7 @@ function Navbar() {
                     </div>
 
                     <div className='flex items-center gap-4 py-4'>
-                        <Link to='#' className="hover:underline">Produtos</Link>
+                        <Link to='/produtos' className="hover:underline">Produtos</Link>
                         <Link to='/categorias' className="hover:underline">Categorias</Link>
                         <Link to='/cadcategoria' className="hover:underline">Cadastrar Categoria</Link>
                         <Link to='#' className="hover:underline">Sair</Link>
