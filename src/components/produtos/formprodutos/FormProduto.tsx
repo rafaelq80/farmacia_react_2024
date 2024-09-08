@@ -7,6 +7,8 @@ import { atualizar, cadastrar, listar } from "../../../services/Service";
 import Categoria from '../../../models/Categoria';
 import Produto from '../../../models/Produto';
 import { ToastAlerta } from '../../../utils/ToastAlerta';
+import { useAuthStore } from '../../../store/AuthStore';
+import { NumericFormat } from 'react-number-format';
 
 function FormProduto() {
 
@@ -15,35 +17,71 @@ function FormProduto() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [categorias, setCategorias] = useState<Categoria[]>([])
 
-    const [categoria, setCategoria] = useState<Categoria>({ id: 0, nome: '', })
+    const [categoria, setCategoria] = useState<Categoria>({ id: 0, grupo: '', })
     const [produto, setProduto] = useState<Produto>({} as Produto)
 
     const [categoriaDefault, setCategoriaDefault] = useState<number>(0)
-    const [carregandoCategoria, setCarregandoCategoria] = useState<boolean>(true)
+    const [isCategoria, setIsCategoria] = useState<boolean>(true)
 
     const { id } = useParams<{ id: string }>()
 
+    const { usuario, handleLogout } = useAuthStore();
+    const token = usuario.token
+
     async function buscarProdutoPorId(id: string) {
-        try{
-            await listar(`/produtos/${id}`, setCategoria)
-        }catch(error: any){
-            ToastAlerta('Produto não Encontrado!', 'erro')
-            retornar();
+        try {
+            await listar(`/produtos/${id}`, setProduto, {
+                headers: {
+                    'Authorization': token
+                }
+            })
+        } catch (error: any) {
+            if (error.toString().includes('401')) {
+                handleLogout()
+            } else {
+                ToastAlerta('Produto não Encontrado!', 'erro')
+                retornar();
+            }
         }
     }
 
     async function buscarCategoriaPorId(id: string) {
-        try{
-            await listar(`/categorias/${id}`, setCategoria)
-        }catch(error: any){
-            ToastAlerta('Categoria não Encontrada!', 'erro')
-            retornar();
+        try {
+            await listar(`/categorias/${id}`, setCategoria, {
+                headers: {
+                    'Authorization': token
+                }
+            })
+        } catch (error: any) {
+            if (error.toString().includes('401')) {
+                handleLogout()
+            } else {
+                ToastAlerta('Categoria não Encontrada!', 'erro')
+                retornar();
+            }
         }
     }
 
     async function buscarCategorias() {
-        await listar('/categorias', setCategorias)
+        try {
+            await listar('/categorias', setCategorias, {
+                headers: {
+                    'Authorization': token
+                }
+            })
+        } catch (error: any) {
+            if (error.toString().includes('401')) {
+                handleLogout()
+            }
+        }
     }
+
+    useEffect(() => {
+        if (token === '') {
+            ToastAlerta('Você precisa estar logado!', 'info')
+            navigate('/')
+        }
+    }, [token])
 
     useEffect(() => {
         buscarCategorias()
@@ -59,18 +97,28 @@ function FormProduto() {
             produto.categoria?.id !== undefined &&
             produto.categoria?.id > 0) {
             setCategoriaDefault(produto.categoria!.id)
-            setCarregandoCategoria(false)
+            setIsCategoria(false)
         }
-    }, [produto.categoria])
+
+    }, [produto.categoria, produto.preco])
 
     useEffect(() => {
         setProduto({
             ...produto,
-            categoria: categoria
+            categoria: categoria,
+            categoria_id: categoria.id //Exclusivo do Golang
         })
     }, [categoria])
 
     function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
+
+        let value: any;
+
+        if (e.target.name === "preco") {
+            value = parseFloat(Number(e.target.value).toFixed(2))
+        } else {
+            value = e.target.value
+        }
 
         if (categoriaDefault !== null &&
             categoriaDefault !== undefined &&
@@ -80,8 +128,10 @@ function FormProduto() {
 
         setProduto({
             ...produto,
-            [e.target.name]: e.target.value,
-            categoria: categoria
+            [e.target.name]: value,
+            categoria: categoria,
+            categoria_id: categoria.id, //Exclusivo do Golang
+            usuario_id: usuario.id //Exclusivo do Golang
         });
     }
 
@@ -95,28 +145,46 @@ function FormProduto() {
 
         if (id != undefined) {
             try {
-                await atualizar(`/produtos`, produto, setProduto);
+                await atualizar(`/produtos`, produto, setProduto, {
+                    headers: {
+                        'Authorization': token
+                    }
+                });
 
                 ToastAlerta('Produto atualizado com sucesso', 'sucesso')
 
             } catch (error: any) {
-                ToastAlerta('Erro ao atualizar o Produto', 'erro')
+                if (error.toString().includes('401')) {
+                    handleLogout()
+                } else {
+                    ToastAlerta('Erro ao atualizar o Produto', 'erro')
+                }
             }
 
         } else {
             try {
-                await cadastrar(`/produtos`, produto, setProduto)
+                await cadastrar(`/produtos`, produto, setProduto, {
+                    headers: {
+                        'Authorization': token
+                    }
+                })
 
                 ToastAlerta('Produto cadastrado com sucesso', 'sucesso');
 
             } catch (error: any) {
-                ToastAlerta('Erro ao cadastrar a Postagem', 'erro');
+                if (error.toString().includes('401')) {
+                    handleLogout()
+                } else {
+                    ToastAlerta('Erro ao cadastrar a Postagem', 'erro');
+                }
             }
         }
 
         setIsLoading(false)
         retornar()
     }
+
+    console.log(JSON.stringify(produto))
 
     return (
 
@@ -142,17 +210,20 @@ function FormProduto() {
                 <div className="flex flex-col gap-2">
                     <label htmlFor="titulo">Preço do Produto</label>
 
-                    <input
-                        value={produto.preco}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-                        type="number"
-                        step=".01"
-                        // pattern='d\+\.\d\d$'
-                        placeholder="Adicione aqui o preço do Produto"
+                    <NumericFormat
                         name="preco"
                         required
+                        placeholder={"Adicione aqui o preço do Produto"}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+                        value={produto.preco}
+                        thousandSeparator={true}
+                        decimalSeparator='.'
+                        decimalScale={2}
+                        fixedDecimalScale
+                        allowLeadingZeros
                         className="border-2 border-slate-700 rounded p-2"
                     />
+
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -177,14 +248,14 @@ function FormProduto() {
                         <option value="" selected disabled>Selecione uma Categoria</option>
                         {categorias.map((categoria) => (
                             <>
-                                <option value={categoria.id} selected={categoriaDefault === categoria.id}>{categoria.nome}</option>
+                                <option value={categoria.id} selected={categoriaDefault === categoria.id}>{categoria.grupo}</option>
                             </>
                         ))}
                     </select>
                 </div>
                 <button
                     type='submit'
-                    disabled={carregandoCategoria}
+                    disabled={isCategoria}
                     className='flex justify-center rounded disabled:bg-slate-200 bg-indigo-400 
                             hover:bg-indigo-800 text-white font-bold w-1/2 mx-auto py-2'
                 >

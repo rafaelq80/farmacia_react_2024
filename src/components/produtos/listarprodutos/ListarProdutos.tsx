@@ -3,14 +3,39 @@ import { DNA } from 'react-loader-spinner';
 import Produto from '../../../models/Produto';
 import { listar } from '../../../services/Service';
 import CardProdutos from '../cardprodutos/CardProdutos';
+import { useAuthStore } from '../../../store/AuthStore';
+import { ToastAlerta } from '../../../utils/ToastAlerta';
+import { useNavigate } from 'react-router-dom';
 
 function ListarProdutos() {
 
+  const navigate = useNavigate()
+  
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
+  const { usuario, handleLogout } = useAuthStore();
+  const token = usuario.token
+
   async function buscarProdutos() {
-    await listar('/produtos', setProdutos);
+    try {
+      await listar('/produtos', setProdutos, {
+        headers: {
+          'Authorization': token
+        }
+      });
+    } catch (error: any) {
+      if (error.toString().includes('401')) {
+        handleLogout()
+      }
+    }
   }
+
+  useEffect(() => {
+    if (token === '') {
+      ToastAlerta('Você precisa estar logado!', 'info')
+      navigate('/')
+    }
+  }, [token])
 
   useEffect(() => {
     buscarProdutos();

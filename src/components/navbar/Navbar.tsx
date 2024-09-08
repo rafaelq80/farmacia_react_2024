@@ -1,10 +1,28 @@
 import { User, ShoppingCart, MagnifyingGlass } from "@phosphor-icons/react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { useAuthStore } from "../../store/AuthStore";
+import { ToastAlerta } from "../../utils/ToastAlerta";
+import { ReactNode } from "react";
 
 function Navbar() {
 
-    return (
-        <>
+    const navigate = useNavigate();
+
+    const { usuario, handleLogout } = useAuthStore()
+
+    function logout() {
+
+        handleLogout()
+        ToastAlerta('Usuário desconectado!', 'info')
+        navigate('/')
+
+    }
+
+    let component: ReactNode
+
+    if (usuario.token !== '') {
+        
+        component = (
             <div className='flex justify-center bg-indigo-900 py-4 w-full text-white'>
                 <div className="flex justify-between text-lg container">
                     <Link to='/home'>
@@ -36,12 +54,18 @@ function Navbar() {
                         <Link to='/produtos' className="hover:underline">Produtos</Link>
                         <Link to='/categorias' className="hover:underline">Categorias</Link>
                         <Link to='/cadcategoria' className="hover:underline">Cadastrar Categoria</Link>
-                        <Link to='#' className="hover:underline">Sair</Link>
-                        <Link to='#' ><User size={32} weight='bold' /></Link>
+                        <Link to='' onClick={logout} className="hover:underline">Sair</Link>
+                        <Link to='/Perfil' ><User size={32} weight='bold' /></Link>
                         <Link to='#' ><ShoppingCart size={32} weight='bold' /></Link>
                     </div>
                 </div>
             </div>
+        )
+    }
+
+    return (
+        <>
+            {component}
         </>
     )
 }

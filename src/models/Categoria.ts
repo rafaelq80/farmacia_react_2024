@@ -2,6 +2,6 @@ import Produto from "./Produto";
 
 export default interface Categoria {
     id: number;
-    nome: string;
+    grupo: string;
     produto?: Produto | null;
 }

@@ -11,6 +11,8 @@ import 'react-toastify/dist/ReactToastify.css'
 import FormProduto from "./components/produtos/formprodutos/FormProduto"
 import ListarProdutos from "./components/produtos/listarprodutos/ListarProdutos"
 import DeletarProduto from "./components/produtos/deletarproduto/DeletarProduto"
+import Login from "./pages/login/Login"
+import Perfil from "./pages/perfil/Perfil"
 
 function App() {
 
@@ -22,7 +24,7 @@ function App() {
         <Navbar />
         <div className="min-h-[90vh] bg-gray-200">
           <Routes>
-            <Route path='/' element={<Home />} />
+            <Route path='/' element={<Login />} />
             <Route path='/home' element={<Home />} />
             <Route path="/categorias" element={<ListarCategorias />} />
             <Route path="/cadcategoria" element={<FormCategoria />} />
@@ -32,6 +34,7 @@ function App() {
             <Route path="/cadproduto" element={<FormProduto />} />
             <Route path="/editarproduto/:id" element={<FormProduto />} />
             <Route path="/deletarproduto/:id" element={<DeletarProduto />} />
+            <Route path="/perfil" element={<Perfil />} />
           </Routes>
         </div>
         <Footer />

@@ -1,0 +1,8 @@
+.fundoLogin {
+    background-image: url("https://ik.imagekit.io/vzr6ryejm/farmacia/login.jpg?updatedAt=1725794373584");
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+}
