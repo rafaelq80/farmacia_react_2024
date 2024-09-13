@@ -7,6 +7,7 @@ import { ToastAlerta } from '../utils/ToastAlerta';
 
 
 export function useFormProduto(id: string | undefined, navigate: any) {
+    
     const { usuario, handleLogout } = useAuthStore();
     const token = usuario.token;
 
@@ -34,7 +35,7 @@ export function useFormProduto(id: string | undefined, navigate: any) {
                     await listar(`/produtos/${id}`, setProduto, {
                         headers: { 'Authorization': token }
                     });
-                    if (produto.categoria?.id) {
+                    if (produto.categoria?.id && produto.categoria?.id > 0) {
                         setCategoriaDefault(produto.categoria.id);
                         setIsCategoria(false);
                     }
@@ -121,4 +122,5 @@ export function useFormProduto(id: string | undefined, navigate: any) {
         gerarNovoProduto,
         buscarCategoriaPorId
     };
+
 }
