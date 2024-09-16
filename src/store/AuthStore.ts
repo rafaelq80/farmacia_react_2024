@@ -8,6 +8,7 @@ interface AuthContextProps {
     usuario: UsuarioLogin;
     handleLogout(): void;
     handleLogin(usuario: UsuarioLogin): Promise<void>;
+    setFoto(novaFoto: string):  void;
     isLoading: boolean;
 }
 
@@ -15,7 +16,7 @@ interface AuthContextProps {
 export const useAuthStore = create<AuthContextProps>((set) => ({
     usuario: {
         id: 0,
-        nome: '',
+        name: '',
         usuario: '',
         senha: '',
         foto: '',
@@ -42,12 +43,17 @@ export const useAuthStore = create<AuthContextProps>((set) => ({
         set({
             usuario: {
                 id: 0,
-                nome: '',
+                name: '',
                 usuario: '',
                 senha: '',
                 foto: '',
                 token: '',
             }
         });
-    }
+    },
+
+    setFoto: (novaFoto: string) => set((state) => ({
+        usuario: { ...state.usuario, foto: novaFoto }
+      })),
+      
 }));

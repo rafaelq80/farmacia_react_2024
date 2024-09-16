@@ -7,20 +7,8 @@ import { ToastAlerta } from "../../../utils/ToastAlerta";
 import { Check, X } from "@phosphor-icons/react";
 import { useAuthStore } from "../../../store/AuthStore";
 
-// Estilos separados em um objeto
-const styles = {
-    container: "container w-1/3 mx-auto",
-    title: "text-4xl text-center py-4",
-    description: "text-center font-semibold mb-4",
-    productContainer: "border flex flex-col rounded-2xl overflow-hidden justify-between",
-    header: "py-2 px-6 bg-indigo-800 text-white font-bold text-2xl",
-    productName: "p-8 text-3xl bg-white h-full",
-    buttonContainer: "flex",
-    cancelButton: "text-slate-100 bg-red-400 hover:bg-red-600 w-full py-2 flex justify-center",
-    confirmButton: "w-full text-slate-100 bg-indigo-400 hover:bg-indigo-600 flex items-center justify-center",
-  };
-  
 function DeletarProduto() {
+
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { usuario, handleLogout } = useAuthStore();
@@ -81,19 +69,19 @@ function DeletarProduto() {
   }
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Deletar Produto</h1>
-      <p className={styles.description}>
+    <div className='mx-auto w-1/3 container'>
+      <h1 className='py-4 text-4xl text-center'>Deletar Produto</h1>
+      <p className='mb-4 font-semibold text-center'>
         Você tem certeza de que deseja apagar o Produto a seguir?
       </p>
-      <div className={styles.productContainer}>
-        <header className={styles.header}>Produto</header>
-        <p className={styles.productName}>{produto.nome}</p>
-        <div className={styles.buttonContainer}>
-          <button className={styles.cancelButton} onClick={retornar}>
+      <div className='flex flex-col justify-between border rounded-2xl overflow-hidden'>
+        <header className='bg-indigo-800 px-6 py-2 font-bold text-2xl text-white'>Produto</header>
+        <p className='bg-white p-8 h-full text-3xl'>{produto.nome}</p>
+        <div className='flex'>
+          <button className='flex justify-center bg-red-400 hover:bg-red-600 py-2 w-full text-slate-100' onClick={retornar}>
             <X size={28} color="#ffffff" weight="bold" />
           </button>
-          <button className={styles.confirmButton} onClick={deletarProduto}>
+          <button className='flex justify-center items-center bg-indigo-400 hover:bg-indigo-600 w-full text-slate-100' onClick={deletarProduto}>
             {isLoading ? (
               <RotatingLines
                 strokeColor="white"

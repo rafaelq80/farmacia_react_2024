@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../store/AuthStore";
-import { ToastAlerta } from "../../utils/ToastAlerta";
+import { useAuthStore } from "../../../store/AuthStore";
+import { ToastAlerta } from "../../../utils/ToastAlerta";
 
 // Estilos separados em constantes
 const styles = {

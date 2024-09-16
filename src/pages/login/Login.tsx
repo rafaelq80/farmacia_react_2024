@@ -35,11 +35,10 @@ function Login() {
 
     return (
         <>
-            <div className="grid grid-cols-1 lg:grid-cols-2 
-                    h-screen place-items-center font-bold ">
-                <form className="flex justify-center items-center flex-col w-1/2 gap-4"
+            <div className="place-items-center grid grid-cols-1 lg:grid-cols-2 h-screen font-bold">
+                <form className="flex flex-col justify-center items-center gap-4 w-1/2"
                     onSubmit={login}>
-                    <h2 className="text-slate-900 text-5xl ">Entrar</h2>
+                    <h2 className="text-5xl text-slate-900">Entrar</h2>
                     <div className="flex flex-col w-full">
                         <label htmlFor="usuario">Usuário</label>
                         <input
@@ -47,12 +46,10 @@ function Login() {
                             id="usuario"
                             name="usuario"
                             placeholder="Usuario"
-                            className="border-2 border-slate-700 rounded p-2"
+                            className="border-2 border-slate-700 p-2 rounded"
                             value={usuarioLogin.usuario}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
                             required
-                            // onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Digite um e-mail válido!')}
-                            // onInput={e => (e.target as HTMLInputElement).setCustomValidity('')}
                         />
                     </div>
                     <div className="flex flex-col w-full">
@@ -62,18 +59,15 @@ function Login() {
                             id="senha"
                             name="senha"
                             placeholder="Senha"
-                            className="border-2 border-slate-700 rounded p-2"
+                            className="border-2 border-slate-700 p-2 rounded"
                             value={usuarioLogin.senha}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
                             required
-                            // onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Digite a senha!')}
-                            // onInput={e => (e.target as HTMLInputElement).setCustomValidity('')}
                         />
                     </div>
                     <button
                         type='submit'
-                        className="rounded bg-slate-400 hover:bg-slate-800 flex justify-center
-                                    text-white w-1/2 py-2">
+                        className="flex justify-center bg-indigo-400 hover:bg-indigo-800 mx-auto py-2 rounded w-1/2 text-slate-100">
                                     
                         {isLoading ? <RotatingLines
                             strokeColor="white"
@@ -101,7 +95,7 @@ function Login() {
                         </Link>
                     </p>
                 </form>
-                <div className="fundoLogin hidden lg:block"></div>
+                <div className="lg:block hidden fundoLogin"></div>
             </div>
         </>
     );

@@ -12,7 +12,9 @@ import FormProduto from "./components/produtos/formprodutos/FormProduto"
 import ListarProdutos from "./components/produtos/listarprodutos/ListarProdutos"
 import DeletarProduto from "./components/produtos/deletarproduto/DeletarProduto"
 import Login from "./pages/login/Login"
-import Perfil from "./pages/perfil/Perfil"
+import Perfil from "./pages/usuarios/perfil/Perfil"
+import Cadastro from "./pages/usuarios/cadastro/Cadastro"
+import AtualizarUsuario from "./pages/usuarios/atualizarusuario/AtualizarUsuario"
 
 function App() {
 
@@ -22,9 +24,10 @@ function App() {
       <ToastContainer />
       <BrowserRouter>
         <Navbar />
-        <div className="min-h-[90vh] bg-gray-200">
+        <div className="bg-gray-200 min-h-[90vh]">
           <Routes>
             <Route path='/' element={<Login />} />
+            <Route path='/cadastro' element={<Cadastro />} />
             <Route path='/home' element={<Home />} />
             <Route path="/categorias" element={<ListarCategorias />} />
             <Route path="/cadcategoria" element={<FormCategoria />} />
@@ -35,6 +38,7 @@ function App() {
             <Route path="/editarproduto/:id" element={<FormProduto />} />
             <Route path="/deletarproduto/:id" element={<DeletarProduto />} />
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/atualizarusuario" element={<AtualizarUsuario />} />
           </Routes>
         </div>
         <Footer />

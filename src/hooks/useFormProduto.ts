@@ -1,126 +1,146 @@
 import { ChangeEvent, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Categoria from '../models/Categoria';
 import Produto from '../models/Produto';
 import { listar, atualizar, cadastrar } from '../services/Service';
 import { useAuthStore } from '../store/AuthStore';
-import { ToastAlerta } from '../utils/ToastAlerta';
 
+export function useFormProduto() {
 
-export function useFormProduto(id: string | undefined, navigate: any) {
-    
-    const { usuario, handleLogout } = useAuthStore();
-    const token = usuario.token;
-
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [categoria, setCategoria] = useState<Categoria>({ id: 0, grupo: '' });
     const [produto, setProduto] = useState<Produto>({} as Produto);
-    const [categoriaDefault, setCategoriaDefault] = useState<number>(0);
-    const [isCategoria, setIsCategoria] = useState<boolean>(true);
+
+    const { id } = useParams<{ id: string }>();
+    const { usuario, handleLogout } = useAuthStore();
+    const token = usuario.token;
+
+    const handleAuthError = (error: any) => {
+        if (error.toString().includes('401')) 
+            handleLogout();
+    };
+
+
+    async function buscarProdutoPorId(id: string) {
+        try {
+            await listar(`/produtos/${id}`, setProduto, {
+                headers: { 'Authorization': token },
+            });
+
+            // Aqui garantimos que a categoria é buscada depois do produto ser definido
+            if (produto.categoria?.id) {
+                await buscarCategoriaPorId(produto.categoria.id.toString());
+            }
+
+        } catch (error: any) {
+            handleAuthError(error);
+        }
+    }
+
+    async function buscarCategoriaPorId(id: string) {
+        try {
+            await listar(`/categorias/${id}`, setCategoria, {
+                headers: { 'Authorization': token },
+            });
+        } catch (error: any) {
+            handleAuthError(error);
+        }
+    }
+
+    async function buscarCategorias() {
+        try {
+            await listar(`/categorias`, setCategorias, {
+                headers: { Authorization: token },
+            });
+        } catch (error: any) {
+            handleAuthError(error);
+        }
+    }
 
     useEffect(() => {
         if (!token) {
-            ToastAlerta('Você precisa estar logado!', 'info');
+            alert('Você precisa estar logado!');
             navigate('/');
-        }
-    }, [token, navigate]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                await listar('/categorias', setCategorias, {
-                    headers: { 'Authorization': token }
-                });
-                if (id) {
-                    await listar(`/produtos/${id}`, setProduto, {
-                        headers: { 'Authorization': token }
-                    });
-                    if (produto.categoria?.id && produto.categoria?.id > 0) {
-                        setCategoriaDefault(produto.categoria.id);
-                        setIsCategoria(false);
-                    }
-                }
-            } catch (error: any) {
-                handleError(error);
+        } else {
+            buscarCategorias();
+            if (id) {
+                buscarProdutoPorId(id);
             }
-        };
-        fetchData();
+        }
     }, [id, token]);
 
+    // Sincronizar o estado da categoria ao produto
     useEffect(() => {
-        setProduto(prevProduto => ({
-            ...prevProduto,
-            categoria,
-            categoria_id: categoria.id,
-            usuario_id: usuario.id
-        }));
-    }, [categoria, usuario.id]);
-
-    const handleError = (error: any) => {
-        if (error.toString().includes('401')) {
-            handleLogout();
-        } else {
-            ToastAlerta('Erro ao processar a solicitação!', 'erro');
+        if (produto.categoria) {
+            setCategoria(produto.categoria);
         }
-    };
+    }, [produto.categoria]);
 
-    const atualizarEstado = (e: ChangeEvent<HTMLInputElement>) => {
+    // Atualizar o produto com a nova categoria
+    useEffect(() => {
+        if (categoria.id !== 0) {
+            setProduto((prevProduto) => ({
+                ...prevProduto,
+                categoria: categoria,
+                categoria_id: categoria.id, // Exclusivo do Golang
+            }));
+        }
+    }, [categoria]);
+
+    function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
+        
         const { name, value } = e.target;
-        const updatedValue = name === "preco" ? parseFloat(Number(value).toFixed(2)) : value;
-        setProduto(prevProduto => ({
+
+        setProduto((prevProduto) => ({
             ...prevProduto,
-            [name]: updatedValue,
-            categoria,
-            categoria_id: categoria.id,
-            usuario_id: usuario.id
+            [name]: name === 'preco' ? parseFloat(Number(value).toFixed(2)) : value,
+            categoria: categoria,
+            categoria_id: categoria.id, // Exclusivo do Golang
+            usuario_id: usuario.id // Exclusivo do Golang
         }));
-        if (name === "categoria" && categoriaDefault) {
-            buscarCategoriaPorId(categoriaDefault.toString());
-        }
-    };
+    }
 
-    const buscarCategoriaPorId = async (id: string) => {
-        try {
-            await listar(`/categorias/${id}`, setCategoria, {
-                headers: { 'Authorization': token }
-            });
-        } catch (error: any) {
-            handleError(error);
-        }
-    };
+    function retornar() {
+        navigate('/produtos');
+    }
 
-    const gerarNovoProduto = async (e: ChangeEvent<HTMLFormElement>) => {
+    async function gerarNovoProduto(e: ChangeEvent<HTMLFormElement>) {
         e.preventDefault();
         setIsLoading(true);
+
         try {
             if (id) {
                 await atualizar(`/produtos`, produto, setProduto, {
-                    headers: { 'Authorization': token }
+                    headers: { Authorization: token },
                 });
-                ToastAlerta('Produto atualizado com sucesso', 'sucesso');
+                alert('Produto atualizado com sucesso');
             } else {
                 await cadastrar(`/produtos`, produto, setProduto, {
-                    headers: { 'Authorization': token }
+                    headers: { Authorization: token },
                 });
-                ToastAlerta('Produto cadastrado com sucesso', 'sucesso');
+                alert('Produto cadastrado com sucesso');
             }
         } catch (error: any) {
-            handleError(error);
+            handleAuthError(error);
+            alert(`Erro ao ${id ? 'Atualizar' : 'Cadastrar'} o Produto!`);
         } finally {
             setIsLoading(false);
-            navigate('/produtos');
+            retornar();
         }
-    };
+    }
+
+    const isCategoriaPreenchida = categoria.id !== 0;
 
     return {
-        isLoading,
-        categorias,
         produto,
-        categoriaDefault,
-        isCategoria,
+        categorias,
+        categoria,
+        isLoading,
+        isCategoriaPreenchida,
         atualizarEstado,
         gerarNovoProduto,
         buscarCategoriaPorId
     };
-
 }

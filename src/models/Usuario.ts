@@ -2,7 +2,7 @@ import Produto from "./Produto";
 
 export default interface Usuario {
     id: number;
-    nome: string;
+    name: string;
     usuario: string;
     senha: string;
     foto: string;
