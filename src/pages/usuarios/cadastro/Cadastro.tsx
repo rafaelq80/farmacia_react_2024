@@ -1,67 +1,51 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { RotatingLines } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
-import "./Cadastro.css";
 import Usuario from "../../../models/Usuario";
 import { cadastrarUsuario } from "../../../services/Service";
 import { ToastAlerta } from "../../../utils/ToastAlerta";
+import {
+  CadastroFormData,
+  cadastroSchema,
+} from "../../../validations/CadastroSchema";
+import "./Cadastro.css";
 
 function Cadastro() {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [confirmaSenha, setConfirmaSenha] = useState<string>("");
 
-  const [usuario, setUsuario] = useState<Usuario>({
-    id: 0,
-    name: "",
-    usuario: "",
-    senha: "",
-    foto: "",
+  const [usuario, setUsuario] = useState<Usuario>({} as Usuario);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CadastroFormData>({
+    resolver: zodResolver(cadastroSchema),
   });
 
-  function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
-    setUsuario({
-      ...usuario,
-      [e.target.name]: e.target.value,
-    });
-  }
-
-  function handleConfirmarSenha(e: ChangeEvent<HTMLInputElement>) {
-    setConfirmaSenha(e.target.value);
-  }
-
-  async function cadastrarNovoUsuario(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    // Definir uma foto padrão caso o campo foto esteja vazio
-    const fotoPadrao = "https://ik.imagekit.io/vzr6ryejm/usuarios/noimage.png?updatedAt=1726447964819"; // Substitua pela URL da foto padrão desejada
+  async function cadastrarNovoUsuario(data: CadastroFormData) {
     
-    // Criar uma cópia do usuário com a foto padrão se necessário
-    const usuarioComFotoPadrao = {
-      ...usuario,
-      foto: usuario.foto.trim() === "" ? fotoPadrao : usuario.foto,
-    };
+    // Definir uma foto padrão caso o campo foto esteja vazio
+    const fotoPadrao =
+      "https://ik.imagekit.io/vzr6ryejm/usuarios/noimage.png?updatedAt=1726447964819"; // Substitua pela URL da foto padrão desejada
 
-    if (confirmaSenha === usuarioComFotoPadrao.senha && usuarioComFotoPadrao.senha.length >= 8) {
-      setIsLoading(true);
+    setUsuario({
+      id: 0,
+      name: data.name,
+      usuario: data.usuario,
+      senha: data.senha,
+      foto: data.foto || fotoPadrao,
+    });
 
-      try {
-        await cadastrarUsuario(`/usuarios/cadastrar`, usuarioComFotoPadrao, setUsuario);
-        ToastAlerta("Usuário cadastrado!", "sucesso");
-        navigate("/"); // Navega para a página inicial após o sucesso
-      } catch (error) {
-        ToastAlerta("Erro ao cadastrar o usuário!", "erro");
-      }
-    } else {
-      ToastAlerta(
-        "Dados inconsistentes. Verifique as informações do cadastro.",
-        "erro"
-      );
-      setUsuario((prevUsuario) => ({ ...prevUsuario, senha: "" }));
-      setConfirmaSenha("");
+    try {
+      await cadastrarUsuario(`/usuarios/cadastrar`, usuario, setUsuario);
+      ToastAlerta("Usuário cadastrado!", "sucesso");
+      navigate("/");
+    } catch (error) {
+      ToastAlerta("Erro ao cadastrar o usuário!", "erro");
     }
-
-    setIsLoading(false);
   }
 
   return (
@@ -70,52 +54,50 @@ function Cadastro() {
         <div className="lg:block hidden fundoCadastro"></div>
         <form
           className="flex flex-col justify-center items-center gap-3 w-2/3"
-          onSubmit={cadastrarNovoUsuario}
+          onSubmit={handleSubmit(cadastrarNovoUsuario)}
         >
           <h2 className="text-5xl text-slate-900">Cadastrar</h2>
+
           <div className="flex flex-col w-full">
             <label htmlFor="name">Nome</label>
             <input
               type="text"
               id="name"
-              name="name"
               placeholder="Nome"
-              className="border-2 border-slate-700 p-2 rounded"
-              value={usuario.name}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                atualizarEstado(e)
-              }
-              required
+              className="border-2 border-slate-700 p-1 rounded"
+              {...register("name")}
             />
+            {errors.name && (
+              <span className="font-semibold text-red-500 text-sm">{errors.name.message}</span>
+            )}
           </div>
+
           <div className="flex flex-col w-full">
             <label htmlFor="usuario">Usuario</label>
             <input
               type="email"
               id="usuario"
-              name="usuario"
               placeholder="Usuario"
-              className="border-2 border-slate-700 p-2 rounded"
-              value={usuario.usuario}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                atualizarEstado(e)
-              }
-              required
+              className="border-2 border-slate-700 p-1 rounded"
+              {...register("usuario")}
             />
+            {errors.usuario && (
+              <span className="font-semibold text-red-500 text-sm">{errors.usuario.message}</span>
+            )}
           </div>
+
           <div className="flex flex-col w-full">
             <label htmlFor="foto">Foto</label>
             <input
               type="text"
               id="foto"
-              name="foto"
               placeholder="Foto"
-              className="border-2 border-slate-700 p-2 rounded"
-              value={usuario.foto}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                atualizarEstado(e)
-              }
+              className="border-2 border-slate-700 p-1 rounded"
+              {...register("foto")}
             />
+            {errors.foto && (
+              <span className="font-semibold text-red-500 text-sm">{errors.foto.message}</span>
+            )}
           </div>
 
           <div className="flex flex-col w-full">
@@ -123,15 +105,13 @@ function Cadastro() {
             <input
               type="password"
               id="senha"
-              name="senha"
               placeholder="Senha"
-              className="border-2 border-slate-700 p-2 rounded"
-              value={usuario.senha}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                atualizarEstado(e)
-              }
-              required
+              className="border-2 border-slate-700 p-1 rounded"
+              {...register("senha")}
             />
+            {errors.senha && (
+              <span className="font-semibold text-red-500 text-sm">{errors.senha.message}</span>
+            )}
           </div>
 
           <div className="flex flex-col w-full">
@@ -139,14 +119,15 @@ function Cadastro() {
             <input
               type="password"
               id="confirmarSenha"
-              name="confirmarSenha"
               placeholder="Confirmar Senha"
-              className="border-2 border-slate-700 p-2 rounded"
-              value={confirmaSenha}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                handleConfirmarSenha(e)
-              }
+              className="border-2 border-slate-700 p-1 rounded"
+              {...register("confirmarSenha")}
             />
+            {errors.confirmarSenha && (
+              <span className="font-semibold text-red-500 text-sm">
+                {errors.confirmarSenha.message}
+              </span>
+            )}
           </div>
 
           <div className="flex justify-around gap-8 w-full">
@@ -159,8 +140,9 @@ function Cadastro() {
             <button
               type="submit"
               className="flex justify-center bg-indigo-500 hover:bg-indigo-800 py-2 rounded w-1/2 text-white"
+              disabled={isSubmitting}
             >
-              {isLoading ? (
+              {isSubmitting ? (
                 <RotatingLines
                   strokeColor="white"
                   strokeWidth="5"
