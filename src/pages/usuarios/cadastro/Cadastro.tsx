@@ -33,7 +33,7 @@ function Cadastro() {
 
     setUsuario({
       id: 0,
-      name: data.name,
+      nome: data.nome,
       usuario: data.usuario,
       senha: data.senha,
       foto: data.foto || fotoPadrao,
@@ -59,16 +59,16 @@ function Cadastro() {
           <h2 className="text-5xl text-slate-900">Cadastrar</h2>
 
           <div className="flex flex-col w-full">
-            <label htmlFor="name">Nome</label>
+            <label htmlFor="nome">Nome</label>
             <input
               type="text"
-              id="name"
+              id="nome"
               placeholder="Nome"
               className="border-2 border-slate-700 p-1 rounded"
-              {...register("name")}
+              {...register("nome")}
             />
-            {errors.name && (
-              <span className="font-semibold text-red-500 text-sm">{errors.name.message}</span>
+            {errors.nome && (
+              <span className="font-semibold text-red-500 text-sm">{errors.nome.message}</span>
             )}
           </div>
 

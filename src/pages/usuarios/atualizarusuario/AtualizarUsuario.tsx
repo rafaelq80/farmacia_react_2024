@@ -102,7 +102,7 @@ function AtualizarUsuario() {
         <div className="flex flex-col justify-center items-center w-full">
           <img
             src={fotoAtual}
-            alt={user.name}
+            alt={user.nome}
             className="shadow-md shadow-slate-600 border rounded-full w-3/4 object-cover"
           />
         </div>
@@ -115,14 +115,14 @@ function AtualizarUsuario() {
             onSubmit={atualizarUsuario}
           >
             <div className="flex flex-col w-full">
-              <label htmlFor="name">Nome</label>
+              <label htmlFor="nome">Nome</label>
               <input
                 type="text"
-                id="name"
-                name="name"
+                id="nome"
+                name="nome"
                 placeholder="Nome"
                 className="border-2 border-slate-700 p-2 rounded"
-                value={user.name}
+                value={user.nome}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   atualizarEstado(e)
                 }

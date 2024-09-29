@@ -16,7 +16,7 @@ interface AuthContextProps {
 export const useAuthStore = create<AuthContextProps>((set) => ({
     usuario: {
         id: 0,
-        name: '',
+        nome: '',
         usuario: '',
         senha: '',
         foto: '',
@@ -43,7 +43,7 @@ export const useAuthStore = create<AuthContextProps>((set) => ({
         set({
             usuario: {
                 id: 0,
-                name: '',
+                nome: '',
                 usuario: '',
                 senha: '',
                 foto: '',

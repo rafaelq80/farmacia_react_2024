@@ -1,6 +1,6 @@
 export default interface UsuarioLogin {
     id: number;
-    name: string;
+    nome: string;
     usuario: string;
     senha: string;
     foto: string;
