@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import UsuarioLogin from '../../models/UsuarioLogin';
 import { useAuthStore } from '../../store/AuthStore';
 import './Login.css';
+import { Eye, EyeSlash } from '@phosphor-icons/react';
 
 function Login() {
 
@@ -14,6 +15,8 @@ function Login() {
     const [usuarioLogin, setUsuarioLogin] = useState<UsuarioLogin>(
         {} as UsuarioLogin
     )
+
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         if (usuario.token !== "") {
@@ -52,10 +55,10 @@ function Login() {
                             required
                         />
                     </div>
-                    <div className="flex flex-col w-full">
+                    <div className="relative flex flex-col w-full">
                         <label htmlFor="senha">Senha</label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             id="senha"
                             name="senha"
                             placeholder="Senha"
@@ -64,6 +67,13 @@ function Login() {
                             onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
                             required
                         />
+                         <button 
+                            type="button"
+                            className="top-9 right-2 absolute text-slate-700"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
+                        </button>
                     </div>
                     <button
                         type='submit'

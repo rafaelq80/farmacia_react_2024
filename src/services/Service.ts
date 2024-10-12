@@ -1,7 +1,8 @@
 import axios from "axios"
 
 export const api = axios.create({
-    baseURL: "http://localhost:8000"
+    //baseURL: "http://localhost:8000"
+    baseURL: "https://farmacia-go.onrender.com"
     //baseURL: "https://farmacia-nest.onrender.com/"
     //baseURL: "https://farmacia-nest-t0o5.onrender.com"
   })
