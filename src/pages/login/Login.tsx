@@ -98,12 +98,12 @@ function Login() {
                             Cadastre-se
                         </Link>
                     </p>
-                    <p>
+                    {/* <p>
                         Envie uma mensagem para nós {' '}
                         <Link to="/contato" className="text-indigo-800 hover:underline">
                             Clicando aqui
                         </Link>
-                    </p>
+                    </p> */}
                 </form>
                 <div className="lg:block hidden fundoLogin"></div>
             </div>
